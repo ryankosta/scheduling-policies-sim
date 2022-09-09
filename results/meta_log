@@ -11,5 +11,12 @@ wuklab-02.ucsd.edu_22-09-08_14:58:54: varycores manycores dr ws warn 7ms fromdr
 wuklab-02.ucsd.edu_22-09-08_14:59:39: varycores manycores dr ws nowarn fromdr
 wuklab-02.ucsd.edu_22-09-08_15:38:53: varycores manycores dr ws nowarn fromdr
 wuklab-02.ucsd.edu_22-09-08_15:38:55: varycores manycores dr ws warn 7ms fromdr
+<<<<<<< HEAD
 wuklab-02.ucsd.edu_22-09-09_16:43:45: dr ws warn delay 1ms fromdr
 wuklab-02.ucsd.edu_22-09-09_16:43:47: dr ws warn delay 0ms fromdr
+=======
+wuklab-05_22-09-09_16:52:46: dr ws warn delay 2ms fromdr
+wuklab-05_22-09-09_16:52:53: dr ws warn delay 2ms fromdr
+wuklab-05_22-09-09_16:54:09: dr ws warn delay 3ms fromdr
+wuklab-05_22-09-09_16:54:10: dr ws warn delay 4ms fromdr
+>>>>>>> ab0addc9f029ebfefed37f8c088cca3e19da53b3
