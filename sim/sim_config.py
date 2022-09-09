@@ -16,7 +16,7 @@ class SimConfig:
                  enqueue_by_st_sum=False, always_check_realloc=False, ideal_flag_steal=False, delay_range_by_service_time=False,
                  ideal_reallocation=False, fred_reallocation=False, spin_parking_enabled=False, utilization_range_enabled=False,
                  allow_naive_idle=False, work_steal_park_enabled=False, bimodal_service_time=False, join_bounded_shortest_queue=False,
-                 record_queue_lens=False):
+                 record_queue_lens=False,task_file = None, scale_file = None, warn_delay = 0, disable_scaledown_signal=False):
         # Basic configuration
         self.name = name
         self.description = ""
@@ -63,8 +63,13 @@ class SimConfig:
         self.bimodal_service_time = bimodal_service_time
         self.join_bounded_shortest_queue = join_bounded_shortest_queue
         self.record_queue_lens = record_queue_lens
+        self.task_file = task_file 
+        self.scale_file = scale_file 
+        self.warn_delay = warn_delay
+        self.disable_scaledown_signal = disable_scaledown_signal 
 
         # Constants
+        #TODO make task file configurable param
         self.AVERAGE_SERVICE_TIME = 1000
         self.WORK_STEAL_CHECK_TIME = 120
         self.WORK_STEAL_TIME = 120

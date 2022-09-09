@@ -1,0 +1,13 @@
+wuklab-05_22-09-07_14:02:27: varycores morecores delayrange nowarn
+wuklab-05_22-09-07_14:03:50: varycores morecores delayrange warn 7ms delay
+wuklab-05_22-09-07_14:35:05: varycores morecores delayrange nowarn
+wuklab-05_22-09-07_14:36:06: varycores morecores delayrange warn 7ms delay
+wuklab-02.ucsd.edu_22-09-08_14:55:45: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_14:56:06: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_14:56:40: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_14:57:12: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_14:57:42: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_14:58:54: varycores manycores dr ws warn 7ms fromdr
+wuklab-02.ucsd.edu_22-09-08_14:59:39: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_15:38:53: varycores manycores dr ws nowarn fromdr
+wuklab-02.ucsd.edu_22-09-08_15:38:55: varycores manycores dr ws warn 7ms fromdr

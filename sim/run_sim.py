@@ -42,7 +42,7 @@ if __name__ == "__main__":
         cfg_json_fp.close()
 
     if "-varycores" in sys.argv:
-        cores = [4, 8, 12, 16, 17, 18, 19, 20, 21, 22, 23, 24, 28, 32] #list(range(4, 36, 4))
+        cores = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32] #list(range(4, 36, 4))
         sys.argv.remove("-varycores")
 
     if len(sys.argv) > 2:

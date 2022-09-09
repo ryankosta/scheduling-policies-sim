@@ -11,7 +11,9 @@ from tasks import EnqueuePenaltyTask, Task
 from sim_thread import Thread
 from sim_queue import Queue
 import progress_bar as progress
-
+import pandas as pd
+import ast
+import heapq
 
 class SimulationState:
     """Object to maintain simulation state as time passes."""
@@ -50,6 +52,10 @@ class SimulationState:
         self.reallocations = 0
         self.ws_checks = []
         self.queue_lens = []
+
+        #Etc
+        self.scaleup_heap = None 
+        self.scaledown_heap = None 
 
         self.attempted_flag_steals = 0
 
@@ -262,6 +268,31 @@ class SimulationState:
         self.allocations += 1
         self.last_realloc_choice = self.timer.get_time()
         return chosen_thread
+    def has_scaleup_signal(self):
+        if self.scaleup_heap is None:
+            return False
+        elif len(self.scaleup_heap) == 0:
+            return False
+        else:
+            if (self.scaleup_heap[0] + self.config.warn_delay) <= self.timer.get_time():
+                heapq.heappop(self.scaleup_heap)
+                return True
+            else:
+                return False
+    def has_scaledown_signal(self):
+        if self.scaledown_heap is None or self.config.disable_scaledown_signal:
+            return False
+        elif len(self.scaledown_heap) == 0:
+            return False
+        else:
+            if (self.scaledown_heap[0] + self.config.warn_delay) <= self.timer.get_time():
+                heapq.heappop(self.scaledown_heap)
+                return True
+            else:
+                return False
+
+
+        
 
     def deallocate_thread(self, thread_id):
         """Park the specified thread."""
@@ -357,7 +388,13 @@ class SimulationState:
                 self.threads[i].sibling = self.threads[i + 1]
             else:
                 self.threads[i].sibling = self.threads[i - 1]
-
+        if config.task_file is None:
+            self.initiate_task_distribution(config)
+        else:
+            self.load_task_file(config)
+        if config.scale_file is not None:
+            self.load_scale_file(config)
+    def initiate_task_distribution(self,config):
         # Set tasks and arrival times
         request_rate = config.avg_system_load * config.load_thread_count / config.AVERAGE_SERVICE_TIME
         next_task_time = int(1/request_rate) if config.regular_arrivals else int(random.expovariate(request_rate))
@@ -384,3 +421,40 @@ class SimulationState:
             if config.progress_bar and i % 100 == 0:
                 progress.print_progress(next_task_time, config.sim_duration, decimals=3, length=50)
             i += 1
+    def load_scale_file(self,config):
+        self.scaleup_heap = list()
+        self.scaledown_heap = list()
+        with open(config.scale_file, 'r') as file:
+            data = ast.literal_eval(file.read().replace('\n', ''))
+            for realloc_tuple in data:
+                if realloc_tuple[1] is None:
+                    # Not a real reallocation
+                    continue
+                if realloc_tuple[1] == False:
+                    #scaledown
+                    heapq.heappush(self.scaledown_heap,realloc_tuple[0])
+
+                if realloc_tuple[1] == True:
+                    #scaleup
+                    heapq.heappush(self.scaleup_heap,realloc_tuple[0])
+
+        
+    def load_task_file(self,config):
+        if config.bimodal_service_time:
+            distribution = [500] * 9 + [5500]
+        tasks_df = pd.read_csv(config.task_file)
+        task_times = tasks_df["Arrival Time"] + tasks_df["Time in System"]
+        task_times.sort_values()
+        i = 0
+        for index, arrival_time in task_times.iteritems():
+            if config.constant_service_time:
+                service_time = config.AVERAGE_SERVICE_TIME
+            elif config.bimodal_service_time:
+                 service_time = random.choice(distribution)
+            else:
+                 service_time = int(random.expovariate(1 / config.AVERAGE_SERVICE_TIME))
+            self.tasks.append(Task(service_time, arrival_time,config,self))
+            if config.progress_bar and i % 100 == 0:
+                progress.print_progress(arrival_time, config.sim_duration, decimals=3, length=50)
+            i += 1
+

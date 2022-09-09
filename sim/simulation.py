@@ -193,8 +193,14 @@ class Simulation:
     def reallocate_threads_default(self):
         """Reallocate threads. Grants a core if there is a queue whose head has been around for longer than the
         reallocation timer."""
-        if self.state.any_queue_past_delay_threshold():
+        if self.state.any_queue_past_delay_threshold() or self.state.has_scaleup_signal():
             self.state.allocate_thread()
+        elif self.state.has_scaledown_signal() and \
+                len(self.state.current_buffer_cores(check_work_available=True)) > 0:
+            # Only deallocate if there are buffer cores available
+            # Force clustering of parked cores by choosing min index
+            thread = min(self.state.current_buffer_cores(check_work_available=True))
+            self.state.deallocate_thread(thread)
         else:
             self.state.add_reallocation(None)
 
@@ -208,12 +214,12 @@ class Simulation:
         non_productive_cores = self.state.currently_non_productive_cores()
 
         # Add/remove the difference
-        if queued_tasks < len(non_productive_cores):
+        if queued_tasks < len(non_productive_cores) or self.state.has_scaledown_signal():
             while queued_tasks < len(non_productive_cores):
                 thread = min(non_productive_cores)
                 self.state.deallocate_thread(thread)
                 non_productive_cores = self.state.currently_non_productive_cores()
-        elif queued_tasks > len(non_productive_cores):
+        elif queued_tasks > len(non_productive_cores) or self.state.has_scaleup_signal():
             while queued_tasks > len(non_productive_cores):
                 self.state.allocate_thread()
                 non_productive_cores = self.state.currently_non_productive_cores()
@@ -228,11 +234,11 @@ class Simulation:
             avg_delay = self.state.current_average_queueing_delay()
 
         # If delay is high, add a core
-        if avg_delay > self.config.REALLOCATION_THRESHOLD_MAX:
+        if avg_delay > self.config.REALLOCATION_THRESHOLD_MAX or self.state.has_scaleup_signal():
             self.state.allocate_thread()
 
         # If delay is low, remove a core
-        elif avg_delay < self.config.REALLOCATION_THRESHOLD_MIN:
+        elif avg_delay < self.config.REALLOCATION_THRESHOLD_MIN or self.state.has_scaledown_signal():
             # Only deallocate if there are buffer cores available
             if len(self.state.current_buffer_cores(check_work_available=True)) > 0:
                 # Force clustering of parked cores by choosing min index
@@ -246,11 +252,11 @@ class Simulation:
         utilization = self.state.current_utilization()
 
         # If high utilization, add a thread
-        if utilization > self.config.UTILIZATION_MAX:
+        if utilization > self.config.UTILIZATION_MAX or self.state.has_scaleup_signal():
             self.state.allocate_thread()
 
         # If low utilization, revoke a core
-        elif utilization < self.config.UTILIZATION_MIN and \
+        elif (utilization < self.config.UTILIZATION_MIN  or self.state.has_scaledown_signal()) and \
                 len(self.state.current_buffer_cores(check_work_available=True)) > 0:
             thread = min(self.state.current_buffer_cores(check_work_available=True))
             self.state.deallocate_thread(thread)
@@ -266,7 +272,7 @@ class Simulation:
         num_current_buffer_cores = len(current_buffer_cores)
 
         # If not enough buffer cores, allocate a core
-        if num_current_buffer_cores < allowed_buffer_cores[0]:
+        if num_current_buffer_cores < allowed_buffer_cores[0] or self.state.has_scaleup_signal():
             while len(current_buffer_cores) < allowed_buffer_cores[0]:
                 allocated = self.state.allocate_thread()
                 if allocated is None:
@@ -274,7 +280,7 @@ class Simulation:
                 current_buffer_cores = self.state.current_buffer_cores()
 
         # If too many buffer cores, deallocate a thread
-        elif num_current_buffer_cores > allowed_buffer_cores[1]:
+        elif num_current_buffer_cores > allowed_buffer_cores[1] or self.state.has_scaledown_signal():
             while len(current_buffer_cores) > allowed_buffer_cores[1]:
                 thread = random.choice(current_buffer_cores)
                 self.state.deallocate_thread(thread)
