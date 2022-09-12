@@ -42,7 +42,7 @@
  "locking_enabled": false,
  "work_stealing_enabled": true,
  "parking_enabled": true,
- "fast_forward_enabled": true,
+ "fast_forward_enabled": false,
  "record_allocations": true,
  "reallocation_record": "allocations.file",
  "task_file": "../dagfiles/dag1_dr_task_times.csv",

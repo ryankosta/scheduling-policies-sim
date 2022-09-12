@@ -14,6 +14,15 @@ def print_nonparal(files):
 
     for field, vals in to_print.items():
         print(field + ":" + str(vals))
+def find_files(prefix):
+    potentials = os.listdir(".")
+    offset = -7
+    actuals = dict()
+    for potential in potentials:
+        if prefix in potential:
+            actuals[potential[offset]] = potential
+    return actuals
+
 def print_paral(files):
     warn_cts = []
     nowarn_cts = []
@@ -83,8 +92,6 @@ def print_paral(files):
             row += 1
             col = 0
     plt.show()
-
-
 
 IGNORE_FIELDS = ["Run ID","Cores","Description"]
 def compare(fieldname,warn, nowarn):
