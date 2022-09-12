@@ -61,8 +61,7 @@ class Simulation:
                 next_arrival, next_alloc = self.find_next_arrival_and_alloc(task_number, allocation_number)
                 time_jump, reschedule_required = self.find_time_jump(next_arrival, next_alloc,
                                                                      immediate_reschedule=reschedule_required)
-
-            logging.debug("\n(jump: {}, rr: {})".format(time_jump, reschedule_required))
+                logging.debug("\n(jump: {}, rr: {})".format(time_jump, reschedule_required))
 
             # Put new task arrivals in queues
             while task_number < self.state.tasks_scheduled and \
