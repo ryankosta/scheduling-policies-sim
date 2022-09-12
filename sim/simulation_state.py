@@ -290,6 +290,27 @@ class SimulationState:
                 return True
             else:
                 return False
+    def time_until_scale_signal(self):
+        time  = None
+        if len(self.scaledown_heap) != 0 and not self.config.disable_scaledown_signal:
+            time = self.scaledown_heap[0] + self.config.warn_delay
+        if len(self.scaleup_heap) != 0:
+            if time is not None:
+                time = min(time, self.scaleup_heap[0] + self.config.warn_delay)
+            else:
+                time = self.scaleup_heap[0]
+        if time is None:
+            return None
+        time_until = time - self.get_time()
+        if time_until < 0:
+            return 0
+        else:
+            return time_until
+
+
+        
+
+
 
 
         

@@ -327,6 +327,10 @@ class Simulation:
                 else:
                     time_until_threshold_passed = self.config.REALLOCATION_THRESHOLD_MAX - \
                                                   int(self.state.current_average_queueing_delay())
+                    if self.config.scale_file is not None:
+                        time_until_scale = self.state.time_until_scale_signal()
+                        if time_until_scale is not None:
+                            time_until_threshold_passed = min(time_until_scale,time_until_threshold_passed)
 
             elif self.config.buffer_cores_enabled:
                 # Buffer cores cannot change between other actions
